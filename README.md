@@ -110,7 +110,6 @@ file_enc.encrypt_to(file_generator, "./test_files/tset_tnirpregnif.bmp")
 from Cipher import AES_CTR
 from ImageGenerator import BMPImage
 from FileEncryptor import BMPEncryptor
-from BytesGenerator import BytesGenerator
     
 key = b"0123456789abcdef"
 nonce = b"0011223344556677"
