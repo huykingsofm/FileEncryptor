@@ -9,7 +9,7 @@ Encrypt and decrypt a arbitrary file
 
 ### @Constructor
 ```Py
-__init__(self, cipher: Cipher, buffer_size:int = 1000)
+def __init__(self, cipher: Cipher, buffer_size:int = 1000)
 ```
 **Parameters**
 * `cipher`: a object in module [Cipher](https://github.com/huykingsofm/LocalVNetwork/blob/master/Cipher.py). This is type of Cipher which encrypt and decrypt your file.
@@ -18,7 +18,7 @@ __init__(self, cipher: Cipher, buffer_size:int = 1000)
 
 ### @Method
 ```Py
-encrypt(self, bytes_generator: BytesGenerator)
+def encrypt(self, bytes_generator: BytesGenerator)
 ```
 **Parameters**  
 * bytes_generator: a [`BytesGenerator`](./BytesGenerator.py) which generates block of bytes from bytes itself or file stream.
@@ -28,7 +28,7 @@ The content of encrypted file as bytes object
 
 ### @Method
 ```Py
-encrypt_yield(self, bytes_generator: BytesGenerator)
+def encrypt_yield(self, bytes_generator: BytesGenerator)
 ```
 **Parameters**  
 * bytes_generator: a [`BytesGenerator`](./BytesGenerator.py) which generates block of bytes from bytes itself or file stream.
@@ -38,7 +38,7 @@ The content of encrypted file as iterator of bytes
 
 ### @Method
 ```Py
-encrypt_to(self, bytes_generator: BytesGenerator, ou_filename: str)
+def encrypt_to(self, bytes_generator: BytesGenerator, ou_filename: str)
 ```
 Encrypt content from `BytesGenerator` and save it to a file.  
 **Parameters**  
@@ -51,7 +51,7 @@ No return
 
 ### @Method
 ```Py
-decrypt(self, bytes_generator: BytesGenerator)
+def decrypt(self, bytes_generator: BytesGenerator)
 ```
 **Parameters**  
 * bytes_generator: a [`BytesGenerator`](./BytesGenerator.py) which generates block of bytes from bytes itself or file stream.
@@ -61,7 +61,7 @@ The content of decrypted file as bytes object
 
 ### @Method
 ```Py
-decrypt_yield(self, bytes_generator: BytesGenerator)
+def decrypt_yield(self, bytes_generator: BytesGenerator)
 ```
 **Parameters**  
 * bytes_generator: a [`BytesGenerator`](./BytesGenerator.py) which generates block of bytes from bytes itself or file stream.
@@ -71,7 +71,7 @@ The content of decrypted file as iterator of bytes
 
 ### @Method
 ```Py
-encrypt_to(self, bytes_generator: BytesGenerator, ou_filename: str)
+def encrypt_to(self, bytes_generator: BytesGenerator, ou_filename: str)
 ```
 Decrypt content from `BytesGenerator` and save it to a file.  
 **Parameters**  
