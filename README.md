@@ -108,6 +108,7 @@ file_enc.encrypt_to(file_generator, "./test_files/tset_tnirpregnif.bmp")
 ## Example of BMPEncryptor
 ```Py
 from Cipher import AES_CTR
+from ImageGenerator import BMPImage
 from FileEncryptor import BMPEncryptor
 from BytesGenerator import BytesGenerator
     
