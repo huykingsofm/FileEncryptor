@@ -1,4 +1,4 @@
-from ImageGenerator import BMPImage
+from .ImageGenerator import BMPImage
 
 class FileEncryptor(object):
     def __init__(self, cipher, buffer_size = 1000):

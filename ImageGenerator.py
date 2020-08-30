@@ -1,5 +1,4 @@
-from itertools import tee
-from BytesGenerator import BytesGenerator
+from .BytesGenerator import BytesGenerator
 
 class ImageGeneratorException(Exception): ...
 class ImageFormatError(ImageGeneratorException): ...
