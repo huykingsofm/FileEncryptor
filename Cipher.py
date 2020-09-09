@@ -1,16 +1,14 @@
-# Refer from https://github.com/huykingsofm/LocalVNetwork/Cipher.py
-# Last modified: 10:25AM Aug 25, 2020
 import struct
 import os
 import hashlib
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-
-#from DefinedError import InvalidArgument
-class InvalidArgument(Exception): ...
+from .DefinedError import InvalidArgument
 
 class CipherException(Exception): ...
+
 class EncryptFailed(CipherException): ...
+
 class DecryptFailed(CipherException): ...
 class UnAuthenticatedPacket(DecryptFailed): ...
 
@@ -53,7 +51,7 @@ class NoCipher(_Cipher):
 
     def reset_params(self):
         #Do nothing
-        return True
+        pass
 
 class XorCipher(_Cipher):
     "Encrypt the payload using xor operator: c = p xor key"
@@ -64,7 +62,7 @@ class XorCipher(_Cipher):
 
         super().__init__(key, 1)        
         
-    def reset_key(self, newkey: bytes, finalize = True):
+    def reset_key(self, newkey: bytes):
         if not isinstance(newkey, bytes) or len(newkey) != 1:
             raise InvalidArgument("Key of XorCipher must a bytes object of length 1")
 
@@ -181,6 +179,74 @@ class AES_CTR(_Cipher):
             return False
         return True
 
+class AES_CBC(_Cipher):
+    def __init__(self, key: bytes):
+        if len(key) * 8 not in [128, 192, 256, 512]:
+            raise InvalidArgument("Key size of AES must be in {128, 192, 256, 512}")
+        super().__init__(key, 1)
+
+    def reset_key(self, newkey: bytes):
+        if len(newkey) * 8 not in [128, 192, 256, 512]:
+            raise InvalidArgument("Key size of AES must be in {128, 192, 256, 512}")
+        self.key = newkey
+
+    def encrypt(self, plaintext: bytes, finalize = True) -> bytes:
+        if not isinstance(plaintext, bytes):
+            raise InvalidArgument("Plain text must be a bytes object")
+
+        if not hasattr(self, "encryptor"):
+            raise EncryptFailed("IV has not been set yet")
+        try:
+            ciphertext = self.encryptor.update(plaintext)
+            if finalize:
+                ciphertext += self.encryptor.finalize()
+        except:
+            raise EncryptFailed("Don't reuse iv value again")
+
+        return ciphertext
+
+    def decrypt(self, ciphertext: bytes, finalize = True) -> bytes:
+        if not isinstance(ciphertext, bytes):
+            raise InvalidArgument("Cipher text must be a bytes object")
+
+        if not hasattr(self, "decryptor"):
+            raise EncryptFailed("IV has not been set yet")
+        try:
+            plaintext = self.decryptor.update(ciphertext)
+            if finalize:
+                plaintext += self.decryptor.finalize()
+        except:
+            raise EncryptFailed("Don't reuse iv value again")
+
+        return plaintext
+
+    def set_param(self, index: int, param: bytes) -> None:
+        if not isinstance(param, bytes):
+            raise InvalidArgument("Parameters of AES must be a bytes object")
+
+        if index == 0:
+            if len(param) != 16:
+                raise InvalidArgument("Invalid length of iv value, expected 16 bytes")
+
+            self.iv = param
+            aes = Cipher(algorithms.AES(self.key), modes.CBC(self.iv), default_backend())
+            self.encryptor = aes.encryptor()
+            self.decryptor = aes.decryptor()
+        else:
+            raise InvalidArgument("AES only use the iv value as its parameter")
+
+    def get_param(self, index) -> bytes:
+        if index == 0:
+            return self.iv
+        else:
+            raise InvalidArgument("AES only use the iv value as its parameter")
+
+    def reset_params(self):
+        new_iv = os.urandom(16)
+        if not self.set_param(0, new_iv):
+            return False
+        return True
+
 class SimpleSSL(_Cipher):
     def __init__(self, cipher: _Cipher, hashfunc = hashlib.sha256):
         super().__init__(None, cipher.number_of_params)
@@ -236,22 +302,3 @@ for class_name in dir():
             cipher_from_hash[hash_name(_class)] = _class
     except Exception as e:
         continue
-
-
-if __name__ == "__main__":
-    key1 = os.urandom(16)
-    cipher = AES_CTR(key1)
-    cipher.set_param(0, os.urandom(16))
-    ssl = SimpleSSL(cipher)
-    m = (ssl.encrypt(b"123"))
-    print(m)
-    c = ssl.decrypt(m)
-    print(c)
-
-    key2 = os.urandom(16)
-    ssl.set_param(0, os.urandom(16))
-    ssl.reset_key(key2)
-    m = (ssl.encrypt(b"123"))
-    print(m)
-    c = ssl.decrypt(m)
-    print(c)
